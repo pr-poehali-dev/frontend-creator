@@ -105,18 +105,18 @@ const Index = () => {
         } : { r: 0, g: 0, b: 0 };
       };
 
-      const fontUrls: Record<string, string> = {
-        'Roboto': 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5WZLCzYlKw.ttf',
-        'Arial': 'https://fonts.gstatic.com/s/opensans/v34/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0C4nY1M2xLER.ttf',
-        'Times New Roman': 'https://fonts.gstatic.com/s/crimsontext/v19/wlp2gwHKFkZgtmSR3NB0oRJvaAJSA_JN3Q.ttf',
-        'Georgia': 'https://fonts.gstatic.com/s/gelasio/v10/cIf9MaFLtkE3UjaJxCmrYGkHgIs.ttf',
-        'Courier New': 'https://fonts.gstatic.com/s/courierprime/v9/u-450q2lgwslOqpF_6gQ8kELWwZjW-_-tvg.ttf'
-      };
-
+      const fontCache: Record<string, any> = {};
+      
       const loadFont = async (fontFamily: string) => {
-        const fontUrl = fontUrls[fontFamily] || fontUrls['Roboto'];
+        if (fontCache[fontFamily]) {
+          return fontCache[fontFamily];
+        }
+        
+        const fontUrl = 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5WZLCzYlKw.ttf';
         const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
-        return await pdfDoc.embedFont(fontBytes);
+        const font = await pdfDoc.embedFont(fontBytes);
+        fontCache[fontFamily] = font;
+        return font;
       };
 
       const fullNameFont = await loadFont(positions.fullName.fontFamily);
