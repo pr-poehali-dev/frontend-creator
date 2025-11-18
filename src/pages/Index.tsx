@@ -93,14 +93,15 @@ const Index = () => {
       const firstPage = pages[0];
       const { width, height } = firstPage.getSize();
       
-      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-      const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+      const fontUrl = 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5WZLCzYlKw.ttf';
+      const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
+      const customFont = await pdfDoc.embedFont(fontBytes);
       
       firstPage.drawText(formData.fullName, {
         x: (width * positions.fullName.x / 100),
         y: (height * positions.fullName.y / 100),
         size: positions.fullName.fontSize,
-        font: boldFont,
+        font: customFont,
         color: rgb(0, 0, 0),
       });
       
@@ -108,7 +109,7 @@ const Index = () => {
         x: (width * positions.institution.x / 100),
         y: (height * positions.institution.y / 100),
         size: positions.institution.fontSize,
-        font: font,
+        font: customFont,
         color: rgb(0, 0, 0),
       });
       
@@ -117,7 +118,7 @@ const Index = () => {
         x: (width * positions.coach.x / 100),
         y: (height * positions.coach.y / 100),
         size: positions.coach.fontSize,
-        font: font,
+        font: customFont,
         color: rgb(0, 0, 0),
       });
       
