@@ -96,11 +96,32 @@ const Index = () => {
       const firstPage = pages[0];
       const { width, height } = firstPage.getSize();
       
-      const fontUrl = 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5WZLCzYlKw.ttf';
-      const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
-      const customFont = await pdfDoc.embedFont(fontBytes);
-      
-      const fullNameWidth = customFont.widthOfTextAtSize(formData.fullName, positions.fullName.fontSize);
+      const hexToRgb = (hex: string) => {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+          r: parseInt(result[1], 16) / 255,
+          g: parseInt(result[2], 16) / 255,
+          b: parseInt(result[3], 16) / 255
+        } : { r: 0, g: 0, b: 0 };
+      };
+
+      const fontUrls: Record<string, string> = {
+        'Roboto': 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5WZLCzYlKw.ttf',
+        'Arial': 'https://fonts.gstatic.com/s/opensans/v34/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0C4nY1M2xLER.ttf',
+        'Times New Roman': 'https://fonts.gstatic.com/s/crimsontext/v19/wlp2gwHKFkZgtmSR3NB0oRJvaAJSA_JN3Q.ttf',
+        'Georgia': 'https://fonts.gstatic.com/s/gelasio/v10/cIf9MaFLtkE3UjaJxCmrYGkHgIs.ttf',
+        'Courier New': 'https://fonts.gstatic.com/s/courierprime/v9/u-450q2lgwslOqpF_6gQ8kELWwZjW-_-tvg.ttf'
+      };
+
+      const loadFont = async (fontFamily: string) => {
+        const fontUrl = fontUrls[fontFamily] || fontUrls['Roboto'];
+        const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
+        return await pdfDoc.embedFont(fontBytes);
+      };
+
+      const fullNameFont = await loadFont(positions.fullName.fontFamily);
+      const fullNameColor = hexToRgb(positions.fullName.color);
+      const fullNameWidth = fullNameFont.widthOfTextAtSize(formData.fullName, positions.fullName.fontSize);
       const fullNameX = (width * positions.fullName.x / 100) - (fullNameWidth / 2);
       const fullNameY = (height * positions.fullName.y / 100);
       
@@ -115,31 +136,35 @@ const Index = () => {
         x: fullNameX,
         y: fullNameY,
         size: positions.fullName.fontSize,
-        font: customFont,
-        color: rgb(0, 0, 0),
+        font: fullNameFont,
+        color: rgb(fullNameColor.r, fullNameColor.g, fullNameColor.b),
       });
       
-      const institutionWidth = customFont.widthOfTextAtSize(formData.institution, positions.institution.fontSize);
+      const institutionFont = await loadFont(positions.institution.fontFamily);
+      const institutionColor = hexToRgb(positions.institution.color);
+      const institutionWidth = institutionFont.widthOfTextAtSize(formData.institution, positions.institution.fontSize);
       const institutionX = (width * positions.institution.x / 100) - (institutionWidth / 2);
       
       firstPage.drawText(formData.institution, {
         x: institutionX,
         y: (height * positions.institution.y / 100),
         size: positions.institution.fontSize,
-        font: customFont,
-        color: rgb(0, 0, 0),
+        font: institutionFont,
+        color: rgb(institutionColor.r, institutionColor.g, institutionColor.b),
       });
       
+      const coachFont = await loadFont(positions.coach.fontFamily);
+      const coachColor = hexToRgb(positions.coach.color);
       const coachText = `Тренер: ${formData.coach}`;
-      const coachWidth = customFont.widthOfTextAtSize(coachText, positions.coach.fontSize);
+      const coachWidth = coachFont.widthOfTextAtSize(coachText, positions.coach.fontSize);
       const coachX = (width * positions.coach.x / 100) - (coachWidth / 2);
       
       firstPage.drawText(coachText, {
         x: coachX,
         y: (height * positions.coach.y / 100),
         size: positions.coach.fontSize,
-        font: customFont,
-        color: rgb(0, 0, 0),
+        font: coachFont,
+        color: rgb(coachColor.r, coachColor.g, coachColor.b),
       });
       
       const pdfBytes = await pdfDoc.save();
