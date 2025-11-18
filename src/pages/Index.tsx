@@ -136,9 +136,11 @@ const Index = () => {
         description: "Файл успешно скачан",
       });
     } catch (error) {
+      console.error('PDF generation error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
       toast({
         title: "Ошибка генерации",
-        description: "Не удалось создать диплом. Проверьте формат PDF.",
+        description: `Не удалось создать диплом: ${errorMessage}`,
         variant: "destructive"
       });
     } finally {
