@@ -107,19 +107,35 @@ const Index = () => {
 
       const fontCache: Record<string, any> = {};
       
-      const loadFont = async (fontFamily: string) => {
-        if (fontCache[fontFamily]) {
-          return fontCache[fontFamily];
+      const getFontUrl = (fontFamily: string, fontWeight: string, fontStyle: string) => {
+        const isItalic = fontStyle === 'italic';
+        const isBold = fontWeight === 'bold';
+        
+        if (isBold && isItalic) {
+          return 'https://fonts.gstatic.com/s/roboto/v30/KFOjCnqEu92Fr1Mu51TzBic6CsQ.ttf'; // Bold Italic
+        } else if (isBold) {
+          return 'https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlfBBc4.ttf'; // Bold
+        } else if (isItalic) {
+          return 'https://fonts.gstatic.com/s/roboto/v30/KFOkCnqEu92Fr1Mu51xIIzI.ttf'; // Italic
+        } else {
+          return 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5WZLCzYlKw.ttf'; // Regular
+        }
+      };
+      
+      const loadFont = async (fontFamily: string, fontWeight: string, fontStyle: string) => {
+        const cacheKey = `${fontFamily}-${fontWeight}-${fontStyle}`;
+        if (fontCache[cacheKey]) {
+          return fontCache[cacheKey];
         }
         
-        const fontUrl = 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5WZLCzYlKw.ttf';
+        const fontUrl = getFontUrl(fontFamily, fontWeight, fontStyle);
         const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
         const font = await pdfDoc.embedFont(fontBytes);
-        fontCache[fontFamily] = font;
+        fontCache[cacheKey] = font;
         return font;
       };
 
-      const fullNameFont = await loadFont(positions.fullName.fontFamily);
+      const fullNameFont = await loadFont(positions.fullName.fontFamily, positions.fullName.fontWeight, positions.fullName.fontStyle);
       const fullNameColor = hexToRgb(positions.fullName.color);
       const fullNameWidth = fullNameFont.widthOfTextAtSize(formData.fullName, positions.fullName.fontSize);
       const fullNameX = (width * positions.fullName.x / 100) - (fullNameWidth / 2);
@@ -140,7 +156,7 @@ const Index = () => {
         color: rgb(fullNameColor.r, fullNameColor.g, fullNameColor.b),
       });
       
-      const institutionFont = await loadFont(positions.institution.fontFamily);
+      const institutionFont = await loadFont(positions.institution.fontFamily, positions.institution.fontWeight, positions.institution.fontStyle);
       const institutionColor = hexToRgb(positions.institution.color);
       const institutionWidth = institutionFont.widthOfTextAtSize(formData.institution, positions.institution.fontSize);
       const institutionX = (width * positions.institution.x / 100) - (institutionWidth / 2);
@@ -153,7 +169,7 @@ const Index = () => {
         color: rgb(institutionColor.r, institutionColor.g, institutionColor.b),
       });
       
-      const coachFont = await loadFont(positions.coach.fontFamily);
+      const coachFont = await loadFont(positions.coach.fontFamily, positions.coach.fontWeight, positions.coach.fontStyle);
       const coachColor = hexToRgb(positions.coach.color);
       const coachText = `Тренер: ${formData.coach}`;
       const coachWidth = coachFont.widthOfTextAtSize(coachText, positions.coach.fontSize);
