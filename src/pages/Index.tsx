@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 const Index = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ const Index = () => {
     coach: ''
   });
   const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
   const handleInputChange = (field: string, value: string) => {
@@ -36,7 +38,7 @@ const Index = () => {
     }
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!pdfFile) {
       toast({
         title: "Загрузите шаблон",
@@ -55,10 +57,67 @@ const Index = () => {
       return;
     }
 
-    toast({
-      title: "Диплом сгенерирован",
-      description: "Готовый диплом будет скачан автоматически",
-    });
+    setIsGenerating(true);
+
+    try {
+      const arrayBuffer = await pdfFile.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      
+      const pages = pdfDoc.getPages();
+      const firstPage = pages[0];
+      const { width, height } = firstPage.getSize();
+      
+      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+      
+      firstPage.drawText(formData.fullName, {
+        x: width / 2 - (formData.fullName.length * 12),
+        y: height * 0.55,
+        size: 24,
+        font: boldFont,
+        color: rgb(0, 0, 0),
+      });
+      
+      firstPage.drawText(formData.institution, {
+        x: width / 2 - (formData.institution.length * 8),
+        y: height * 0.45,
+        size: 16,
+        font: font,
+        color: rgb(0, 0, 0),
+      });
+      
+      const coachText = `Тренер: ${formData.coach}`;
+      firstPage.drawText(coachText, {
+        x: width / 2 - (coachText.length * 7),
+        y: height * 0.35,
+        size: 14,
+        font: font,
+        color: rgb(0, 0, 0),
+      });
+      
+      const pdfBytes = await pdfDoc.save();
+      
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `diploma_${formData.fullName.replace(/\s+/g, '_')}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Диплом сгенерирован",
+        description: "Файл успешно скачан",
+      });
+    } catch (error) {
+      toast({
+        title: "Ошибка генерации",
+        description: "Не удалось создать диплом. Проверьте формат PDF.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -182,9 +241,19 @@ const Index = () => {
               onClick={handleGenerate}
               className="w-full h-12 text-base font-medium"
               size="lg"
+              disabled={isGenerating}
             >
-              <Icon name="Sparkles" size={20} className="mr-2" />
-              Сгенерировать диплом
+              {isGenerating ? (
+                <>
+                  <Icon name="Loader2" size={20} className="mr-2 animate-spin" />
+                  Генерация...
+                </>
+              ) : (
+                <>
+                  <Icon name="Sparkles" size={20} className="mr-2" />
+                  Сгенерировать диплом
+                </>
+              )}
             </Button>
           </Card>
         </div>
