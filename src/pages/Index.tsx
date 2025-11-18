@@ -116,19 +116,19 @@ const Index = () => {
         const isItalic = fontStyle === 'italic';
         const isBold = fontWeight === 'bold';
         
-        // Используем jsdelivr CDN с поддержкой кириллицы
-        let fontUrl;
+        // Используем локальные шрифты из node_modules
+        let fontPath;
         if (isBold && isItalic) {
-          fontUrl = 'https://cdn.jsdelivr.net/gh/google/fonts@main/apache/roboto/static/Roboto-BoldItalic.ttf';
+          fontPath = '/node_modules/pdfjs-dist/standard_fonts/LiberationSans-BoldItalic.ttf';
         } else if (isBold) {
-          fontUrl = 'https://cdn.jsdelivr.net/gh/google/fonts@main/apache/roboto/static/Roboto-Bold.ttf';
+          fontPath = '/node_modules/pdfjs-dist/standard_fonts/LiberationSans-Bold.ttf';
         } else if (isItalic) {
-          fontUrl = 'https://cdn.jsdelivr.net/gh/google/fonts@main/apache/roboto/static/Roboto-Italic.ttf';
+          fontPath = '/node_modules/pdfjs-dist/standard_fonts/LiberationSans-Italic.ttf';
         } else {
-          fontUrl = 'https://cdn.jsdelivr.net/gh/google/fonts@main/apache/roboto/static/Roboto-Regular.ttf';
+          fontPath = '/node_modules/pdfjs-dist/standard_fonts/LiberationSans-Regular.ttf';
         }
         
-        const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
+        const fontBytes = await fetch(fontPath).then(res => res.arrayBuffer());
         const font = await pdfDoc.embedFont(fontBytes);
         
         fontCache[cacheKey] = font;
