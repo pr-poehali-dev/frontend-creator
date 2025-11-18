@@ -107,30 +107,36 @@ const Index = () => {
 
       const fontCache: Record<string, any> = {};
       
-      const getFontUrl = (fontFamily: string, fontWeight: string, fontStyle: string) => {
-        const isItalic = fontStyle === 'italic';
-        const isBold = fontWeight === 'bold';
-        
-        if (isBold && isItalic) {
-          return 'https://fonts.gstatic.com/s/roboto/v30/KFOjCnqEu92Fr1Mu51TzBic3CsTYl4BO.ttf';
-        } else if (isBold) {
-          return 'https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlfBBc4AMP6lQ.ttf';
-        } else if (isItalic) {
-          return 'https://fonts.gstatic.com/s/roboto/v30/KFOkCnqEu92Fr1Mu51xIIzIXKMny.ttf';
-        } else {
-          return 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu72xKKTU1Kvnz.ttf';
-        }
-      };
-      
       const loadFont = async (fontFamily: string, fontWeight: string, fontStyle: string) => {
         const cacheKey = `${fontFamily}-${fontWeight}-${fontStyle}`;
         if (fontCache[cacheKey]) {
           return fontCache[cacheKey];
         }
         
-        const fontUrl = getFontUrl(fontFamily, fontWeight, fontStyle);
-        const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
-        const font = await pdfDoc.embedFont(fontBytes);
+        // Используем встроенные шрифты PDF для жирности и курсива
+        const { StandardFonts } = await import('pdf-lib');
+        const isItalic = fontStyle === 'italic';
+        const isBold = fontWeight === 'bold';
+        
+        let font;
+        if (isBold && isItalic) {
+          font = await pdfDoc.embedFont(StandardFonts.HelveticaBoldOblique);
+        } else if (isBold) {
+          font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+        } else if (isItalic) {
+          font = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+        } else {
+          // Только для обычного стиля загружаем Roboto
+          const fontUrl = 'https://cdn.jsdelivr.net/npm/@fontsource/roboto@5.0.8/files/roboto-latin-400-normal.woff';
+          try {
+            const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
+            font = await pdfDoc.embedFont(fontBytes);
+          } catch (error) {
+            // Если не удалось загрузить Roboto, используем Helvetica
+            font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+          }
+        }
+        
         fontCache[cacheKey] = font;
         return font;
       };
