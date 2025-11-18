@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,6 +6,13 @@ import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import PdfEditor from '@/components/PdfEditor';
+
+interface TextPosition {
+  x: number;
+  y: number;
+  fontSize: number;
+}
 
 const Index = () => {
   const [formData, setFormData] = useState({
@@ -15,6 +22,16 @@ const Index = () => {
   });
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showEditor, setShowEditor] = useState(false);
+  const [positions, setPositions] = useState<{
+    fullName: TextPosition;
+    institution: TextPosition;
+    coach: TextPosition;
+  }>({
+    fullName: { x: 50, y: 55, fontSize: 24 },
+    institution: { x: 50, y: 45, fontSize: 16 },
+    coach: { x: 50, y: 35, fontSize: 14 }
+  });
   const { toast } = useToast();
 
   const handleInputChange = (field: string, value: string) => {
@@ -25,6 +42,7 @@ const Index = () => {
     const file = e.target.files?.[0];
     if (file && file.type === 'application/pdf') {
       setPdfFile(file);
+      setShowEditor(false);
       toast({
         title: "Шаблон загружен",
         description: `Файл "${file.name}" успешно загружен`,
@@ -37,6 +55,14 @@ const Index = () => {
       });
     }
   };
+
+  const handlePositionsChange = useCallback((newPositions: {
+    fullName: TextPosition;
+    institution: TextPosition;
+    coach: TextPosition;
+  }) => {
+    setPositions(newPositions);
+  }, []);
 
   const handleGenerate = async () => {
     if (!pdfFile) {
@@ -71,26 +97,26 @@ const Index = () => {
       const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
       
       firstPage.drawText(formData.fullName, {
-        x: width / 2 - (formData.fullName.length * 12),
-        y: height * 0.55,
-        size: 24,
+        x: (width * positions.fullName.x / 100),
+        y: (height * positions.fullName.y / 100),
+        size: positions.fullName.fontSize,
         font: boldFont,
         color: rgb(0, 0, 0),
       });
       
       firstPage.drawText(formData.institution, {
-        x: width / 2 - (formData.institution.length * 8),
-        y: height * 0.45,
-        size: 16,
+        x: (width * positions.institution.x / 100),
+        y: (height * positions.institution.y / 100),
+        size: positions.institution.fontSize,
         font: font,
         color: rgb(0, 0, 0),
       });
       
       const coachText = `Тренер: ${formData.coach}`;
       firstPage.drawText(coachText, {
-        x: width / 2 - (coachText.length * 7),
-        y: height * 0.35,
-        size: 14,
+        x: (width * positions.coach.x / 100),
+        y: (height * positions.coach.y / 100),
+        size: positions.coach.fontSize,
         font: font,
         color: rgb(0, 0, 0),
       });
@@ -226,7 +252,37 @@ const Index = () => {
             </div>
           </Card>
 
-          <Card className="p-6 animate-scale-in" style={{ animationDelay: '0.2s' }}>
+          {pdfFile && formData.fullName && formData.institution && formData.coach && (
+            <div className="animate-scale-in" style={{ animationDelay: '0.15s' }}>
+              {!showEditor ? (
+                <Card className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <Icon name="Settings" size={20} className="text-primary" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-semibold text-primary">Настройка позиций</h2>
+                        <p className="text-sm text-muted-foreground">Точная расстановка текста на дипломе</p>
+                      </div>
+                    </div>
+                    <Button onClick={() => setShowEditor(true)} variant="outline">
+                      <Icon name="Edit" size={16} className="mr-2" />
+                      Открыть редактор
+                    </Button>
+                  </div>
+                </Card>
+              ) : (
+                <PdfEditor 
+                  pdfFile={pdfFile} 
+                  formData={formData}
+                  onPositionsChange={handlePositionsChange}
+                />
+              )}
+            </div>
+          )}
+
+          <Card className="p-6 animate-scale-in" style={{ animationDelay: '0.25s' }}>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Icon name="Download" size={20} className="text-primary" />
