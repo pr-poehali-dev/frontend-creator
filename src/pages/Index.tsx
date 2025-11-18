@@ -5,7 +5,8 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { PDFDocument, rgb } from 'pdf-lib';
+import fontkit from '@pdf-lib/fontkit';
 import PdfEditor from '@/components/PdfEditor';
 
 interface TextPosition {
@@ -88,6 +89,8 @@ const Index = () => {
     try {
       const arrayBuffer = await pdfFile.arrayBuffer();
       const pdfDoc = await PDFDocument.load(arrayBuffer);
+      
+      pdfDoc.registerFontkit(fontkit);
       
       const pages = pdfDoc.getPages();
       const firstPage = pages[0];
