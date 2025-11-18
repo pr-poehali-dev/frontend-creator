@@ -35,9 +35,9 @@ const PdfEditor = ({ pdfFile, formData, onPositionsChange }: PdfEditorProps) => 
   const containerRef = useRef<HTMLDivElement>(null);
   
   const [positions, setPositions] = useState({
-    fullName: { x: 50, y: 55, fontSize: 24 },
-    institution: { x: 50, y: 45, fontSize: 16 },
-    coach: { x: 50, y: 35, fontSize: 14 }
+    fullName: { x: 50, y: 65, fontSize: 28 },
+    institution: { x: 50, y: 35, fontSize: 18 },
+    coach: { x: 50, y: 15, fontSize: 16 }
   });
   
   const [dragging, setDragging] = useState<string | null>(null);
@@ -97,9 +97,9 @@ const PdfEditor = ({ pdfFile, formData, onPositionsChange }: PdfEditorProps) => 
 
   const resetPositions = () => {
     setPositions({
-      fullName: { x: 50, y: 55, fontSize: 24 },
-      institution: { x: 50, y: 45, fontSize: 16 },
-      coach: { x: 50, y: 35, fontSize: 14 }
+      fullName: { x: 50, y: 65, fontSize: 28 },
+      institution: { x: 50, y: 35, fontSize: 18 },
+      coach: { x: 50, y: 15, fontSize: 16 }
     });
   };
 
@@ -165,25 +165,30 @@ const PdfEditor = ({ pdfFile, formData, onPositionsChange }: PdfEditorProps) => 
             onMouseDown={(e) => handleMouseDown('fullName', e)}
           >
             {formData.fullName}
-            <div className="absolute -right-20 top-1/2 -translate-y-1/2 flex gap-1 bg-white rounded-md shadow-lg p-1 pointer-events-auto">
-              <Button 
-                variant="ghost"
-                size="sm"
-                className="w-6 h-6 p-0"
-                onMouseDown={(e) => e.stopPropagation()}
-                onClick={() => handleFontSizeChange('fullName', 2)}
-              >
-                <Icon name="Plus" size={14} />
-              </Button>
-              <Button 
-                variant="ghost"
-                size="sm"
-                className="w-6 h-6 p-0"
-                onMouseDown={(e) => e.stopPropagation()}
-                onClick={() => handleFontSizeChange('fullName', -2)}
-              >
-                <Icon name="Minus" size={14} />
-              </Button>
+            <div className="absolute -right-32 top-1/2 -translate-y-1/2 pointer-events-auto">
+              <div className="bg-white rounded-md shadow-lg p-2 mb-1 text-xs text-slate-600">
+                {positions.fullName.fontSize}px
+              </div>
+              <div className="flex gap-1 bg-white rounded-md shadow-lg p-1">
+                <Button 
+                  variant="ghost"
+                  size="sm"
+                  className="w-6 h-6 p-0"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={() => handleFontSizeChange('fullName', 2)}
+                >
+                  <Icon name="Plus" size={14} />
+                </Button>
+                <Button 
+                  variant="ghost"
+                  size="sm"
+                  className="w-6 h-6 p-0"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={() => handleFontSizeChange('fullName', -2)}
+                >
+                  <Icon name="Minus" size={14} />
+                </Button>
+              </div>
             </div>
           </div>
         )}
@@ -203,25 +208,30 @@ const PdfEditor = ({ pdfFile, formData, onPositionsChange }: PdfEditorProps) => 
             onMouseDown={(e) => handleMouseDown('institution', e)}
           >
             {formData.institution}
-            <div className="absolute -right-20 top-1/2 -translate-y-1/2 flex gap-1 bg-white rounded-md shadow-lg p-1 pointer-events-auto">
-              <Button 
-                variant="ghost"
-                size="sm"
-                className="w-6 h-6 p-0"
-                onMouseDown={(e) => e.stopPropagation()}
-                onClick={() => handleFontSizeChange('institution', 2)}
-              >
-                <Icon name="Plus" size={14} />
-              </Button>
-              <Button 
-                variant="ghost"
-                size="sm"
-                className="w-6 h-6 p-0"
-                onMouseDown={(e) => e.stopPropagation()}
-                onClick={() => handleFontSizeChange('institution', -2)}
-              >
-                <Icon name="Minus" size={14} />
-              </Button>
+            <div className="absolute -right-32 top-1/2 -translate-y-1/2 pointer-events-auto">
+              <div className="bg-white rounded-md shadow-lg p-2 mb-1 text-xs text-slate-600">
+                {positions.institution.fontSize}px
+              </div>
+              <div className="flex gap-1 bg-white rounded-md shadow-lg p-1">
+                <Button 
+                  variant="ghost"
+                  size="sm"
+                  className="w-6 h-6 p-0"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={() => handleFontSizeChange('institution', 2)}
+                >
+                  <Icon name="Plus" size={14} />
+                </Button>
+                <Button 
+                  variant="ghost"
+                  size="sm"
+                  className="w-6 h-6 p-0"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={() => handleFontSizeChange('institution', -2)}
+                >
+                  <Icon name="Minus" size={14} />
+                </Button>
+              </div>
             </div>
           </div>
         )}
@@ -241,25 +251,30 @@ const PdfEditor = ({ pdfFile, formData, onPositionsChange }: PdfEditorProps) => 
             onMouseDown={(e) => handleMouseDown('coach', e)}
           >
             Тренер: {formData.coach}
-            <div className="absolute -right-20 top-1/2 -translate-y-1/2 flex gap-1 bg-white rounded-md shadow-lg p-1 pointer-events-auto">
-              <Button 
-                variant="ghost"
-                size="sm"
-                className="w-6 h-6 p-0"
-                onMouseDown={(e) => e.stopPropagation()}
-                onClick={() => handleFontSizeChange('coach', 2)}
-              >
-                <Icon name="Plus" size={14} />
-              </Button>
-              <Button 
-                variant="ghost"
-                size="sm"
-                className="w-6 h-6 p-0"
-                onMouseDown={(e) => e.stopPropagation()}
-                onClick={() => handleFontSizeChange('coach', -2)}
-              >
-                <Icon name="Minus" size={14} />
-              </Button>
+            <div className="absolute -right-32 top-1/2 -translate-y-1/2 pointer-events-auto">
+              <div className="bg-white rounded-md shadow-lg p-2 mb-1 text-xs text-slate-600">
+                {positions.coach.fontSize}px
+              </div>
+              <div className="flex gap-1 bg-white rounded-md shadow-lg p-1">
+                <Button 
+                  variant="ghost"
+                  size="sm"
+                  className="w-6 h-6 p-0"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={() => handleFontSizeChange('coach', 2)}
+                >
+                  <Icon name="Plus" size={14} />
+                </Button>
+                <Button 
+                  variant="ghost"
+                  size="sm"
+                  className="w-6 h-6 p-0"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={() => handleFontSizeChange('coach', -2)}
+                >
+                  <Icon name="Minus" size={14} />
+                </Button>
+              </div>
             </div>
           </div>
         )}
