@@ -124,29 +124,30 @@ const PdfEditor = ({ pdfFile, formData, onPositionsChange }: PdfEditorProps) => 
       <div 
         ref={containerRef}
         className="relative border-2 border-border rounded-lg overflow-hidden bg-slate-50"
-        style={{ cursor: dragging ? 'grabbing' : 'default' }}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       >
-        <Document
-          file={pdfFile}
-          onLoadSuccess={onDocumentLoadSuccess}
-          loading={
-            <div className="flex items-center justify-center h-96">
-              <Icon name="Loader2" size={32} className="animate-spin text-muted-foreground" />
-            </div>
-          }
-        >
-          <Page 
-            pageNumber={1} 
-            width={containerRef.current?.clientWidth || 595}
-            onLoadSuccess={(page) => {
-              setPageWidth(page.width);
-              setPageHeight(page.height);
-            }}
-          />
-        </Document>
+        <div className="pointer-events-none">
+          <Document
+            file={pdfFile}
+            onLoadSuccess={onDocumentLoadSuccess}
+            loading={
+              <div className="flex items-center justify-center h-96">
+                <Icon name="Loader2" size={32} className="animate-spin text-muted-foreground" />
+              </div>
+            }
+          >
+            <Page 
+              pageNumber={1} 
+              width={containerRef.current?.clientWidth || 595}
+              onLoadSuccess={(page) => {
+                setPageWidth(page.width);
+                setPageHeight(page.height);
+              }}
+            />
+          </Document>
+        </div>
 
         {formData.fullName && (
           <div
