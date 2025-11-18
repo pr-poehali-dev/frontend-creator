@@ -116,16 +116,16 @@ const Index = () => {
         const isItalic = fontStyle === 'italic';
         const isBold = fontWeight === 'bold';
         
-        // Используем разные варианты Roboto с поддержкой кириллицы
+        // Используем jsdelivr CDN с поддержкой кириллицы
         let fontUrl;
         if (isBold && isItalic) {
-          fontUrl = 'https://github.com/google/fonts/raw/main/apache/roboto/static/Roboto-BoldItalic.ttf';
+          fontUrl = 'https://cdn.jsdelivr.net/gh/google/fonts@main/apache/roboto/static/Roboto-BoldItalic.ttf';
         } else if (isBold) {
-          fontUrl = 'https://github.com/google/fonts/raw/main/apache/roboto/static/Roboto-Bold.ttf';
+          fontUrl = 'https://cdn.jsdelivr.net/gh/google/fonts@main/apache/roboto/static/Roboto-Bold.ttf';
         } else if (isItalic) {
-          fontUrl = 'https://github.com/google/fonts/raw/main/apache/roboto/static/Roboto-Italic.ttf';
+          fontUrl = 'https://cdn.jsdelivr.net/gh/google/fonts@main/apache/roboto/static/Roboto-Italic.ttf';
         } else {
-          fontUrl = 'https://github.com/google/fonts/raw/main/apache/roboto/static/Roboto-Regular.ttf';
+          fontUrl = 'https://cdn.jsdelivr.net/gh/google/fonts@main/apache/roboto/static/Roboto-Regular.ttf';
         }
         
         const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
