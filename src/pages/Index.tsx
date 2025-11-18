@@ -100,13 +100,15 @@ const Index = () => {
       const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
       const customFont = await pdfDoc.embedFont(fontBytes);
       
-      const fullNameX = (width * positions.fullName.x / 100);
+      const fullNameWidth = customFont.widthOfTextAtSize(formData.fullName, positions.fullName.fontSize);
+      const fullNameX = (width * positions.fullName.x / 100) - (fullNameWidth / 2);
       const fullNameY = (height * positions.fullName.y / 100);
       
       console.log('PDF size:', { width, height });
       console.log('FullName position:', { 
         percent: positions.fullName, 
-        pixels: { x: fullNameX, y: fullNameY } 
+        pixels: { x: fullNameX, y: fullNameY },
+        textWidth: fullNameWidth
       });
       
       firstPage.drawText(formData.fullName, {
@@ -117,8 +119,11 @@ const Index = () => {
         color: rgb(0, 0, 0),
       });
       
+      const institutionWidth = customFont.widthOfTextAtSize(formData.institution, positions.institution.fontSize);
+      const institutionX = (width * positions.institution.x / 100) - (institutionWidth / 2);
+      
       firstPage.drawText(formData.institution, {
-        x: (width * positions.institution.x / 100),
+        x: institutionX,
         y: (height * positions.institution.y / 100),
         size: positions.institution.fontSize,
         font: customFont,
@@ -126,8 +131,11 @@ const Index = () => {
       });
       
       const coachText = `Тренер: ${formData.coach}`;
+      const coachWidth = customFont.widthOfTextAtSize(coachText, positions.coach.fontSize);
+      const coachX = (width * positions.coach.x / 100) - (coachWidth / 2);
+      
       firstPage.drawText(coachText, {
-        x: (width * positions.coach.x / 100),
+        x: coachX,
         y: (height * positions.coach.y / 100),
         size: positions.coach.fontSize,
         font: customFont,
