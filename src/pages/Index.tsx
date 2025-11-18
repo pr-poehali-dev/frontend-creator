@@ -100,9 +100,18 @@ const Index = () => {
       const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
       const customFont = await pdfDoc.embedFont(fontBytes);
       
+      const fullNameX = (width * positions.fullName.x / 100);
+      const fullNameY = (height * positions.fullName.y / 100);
+      
+      console.log('PDF size:', { width, height });
+      console.log('FullName position:', { 
+        percent: positions.fullName, 
+        pixels: { x: fullNameX, y: fullNameY } 
+      });
+      
       firstPage.drawText(formData.fullName, {
-        x: (width * positions.fullName.x / 100),
-        y: (height * positions.fullName.y / 100),
+        x: fullNameX,
+        y: fullNameY,
         size: positions.fullName.fontSize,
         font: customFont,
         color: rgb(0, 0, 0),
