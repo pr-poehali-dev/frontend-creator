@@ -113,29 +113,23 @@ const Index = () => {
           return fontCache[cacheKey];
         }
         
-        // Используем встроенные шрифты PDF для жирности и курсива
-        const { StandardFonts } = await import('pdf-lib');
         const isItalic = fontStyle === 'italic';
         const isBold = fontWeight === 'bold';
         
-        let font;
+        // Используем разные варианты Roboto с поддержкой кириллицы
+        let fontUrl;
         if (isBold && isItalic) {
-          font = await pdfDoc.embedFont(StandardFonts.HelveticaBoldOblique);
+          fontUrl = 'https://github.com/google/fonts/raw/main/apache/roboto/static/Roboto-BoldItalic.ttf';
         } else if (isBold) {
-          font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+          fontUrl = 'https://github.com/google/fonts/raw/main/apache/roboto/static/Roboto-Bold.ttf';
         } else if (isItalic) {
-          font = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+          fontUrl = 'https://github.com/google/fonts/raw/main/apache/roboto/static/Roboto-Italic.ttf';
         } else {
-          // Только для обычного стиля загружаем Roboto
-          const fontUrl = 'https://cdn.jsdelivr.net/npm/@fontsource/roboto@5.0.8/files/roboto-latin-400-normal.woff';
-          try {
-            const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
-            font = await pdfDoc.embedFont(fontBytes);
-          } catch (error) {
-            // Если не удалось загрузить Roboto, используем Helvetica
-            font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-          }
+          fontUrl = 'https://github.com/google/fonts/raw/main/apache/roboto/static/Roboto-Regular.ttf';
         }
+        
+        const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
+        const font = await pdfDoc.embedFont(fontBytes);
         
         fontCache[cacheKey] = font;
         return font;
